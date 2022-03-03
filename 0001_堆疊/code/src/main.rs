@@ -12,16 +12,16 @@ fn main() {
     let mut ps: Vec<Personal> = Vec::new();
 
     ps.push(Personal { name: String::from("A"), age: 52 });
-    ps.push(Personal { name: String::from("B"), age: 52 });
-    ps.push(Personal { name: String::from("C"), age: 52 });
+    ps.push(Personal { name: String::from("B"), age: 23 });
+    ps.push(Personal { name: String::from("C"), age: 35 });
 
-    // [Personal { name: "A", age: 52 }, Personal { name: "B", age: 52 }, Personal { name: "C", age: 52 }]
+    // [Personal { name: "A", age: 52 }, Personal { name: "B", age: 23 }, Personal { name: "C", age: 35 }]
     println!("{:?}", ps);
 
-    // Some(Personal { name: "C", age: 52 })
+    // Some(Personal { name: "C", age: 35 })
     println!("{:?}", ps.pop());
 
-    // Some(Personal { name: "B", age: 52 })
+    // Some(Personal { name: "B", age: 23 })
     println!("{:?}", ps.pop());
 
     // Some(Personal { name: "A", age: 52 })
