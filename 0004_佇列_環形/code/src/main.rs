@@ -70,4 +70,21 @@ fn main() {
             Err(e) => println!("Error  = {}", e)
         }
     }
+
+    // Some(Personal { name: "0", age: 0 })
+    println!("{:?}", personal_ary.next().unwrap().upgrade());
+
+    personal_ary.push(Personal { name: String::from("New personal"), age: 25 });
+
+    /*
+    Person = Some(Personal { name: "1", age: 1 })
+    Person = Some(Personal { name: "2", age: 2 })
+    Person = Some(Personal { name: "3", age: 3 })
+    Person = Some(Personal { name: "4", age: 4 })
+    Person = Some(Personal { name: "New personal", age: 25 })
+    */
+
+    for person in personal_ary {
+        println!("Person = {:?}", person.upgrade());
+    }
 }
