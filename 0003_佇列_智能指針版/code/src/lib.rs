@@ -6,17 +6,6 @@ pub struct Personal {
     pub age: u32
 }
 
-/*
-impl Clone for Personal {
-    fn clone(&self) -> Personal {
-        Personal {
-            name: self.name.clone(),
-            age: self.age
-        }
-    }
-}
-*/
-
 #[derive(Debug)]
 pub struct PersonalAry {
     pub personal: Vec<Rc<Personal>>
