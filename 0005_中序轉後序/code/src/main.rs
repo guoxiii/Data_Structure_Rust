@@ -49,24 +49,23 @@
             -> A-BC+*D-*
 */
 
-use code::Priority;
+use code::InfixToPostfix;
 
 fn main() {
-    println!("中序\t\t\t後序");
-    println!("----------------------------------------------------");
+    let itp = InfixToPostfix::new();
 
-    print!("A*B+C\t\t\t");
-    Priority::new("A*B+C").show();          // AB*C+
+    // AB*C+
+    println!("中序: A*B+C，後序: {}", itp.to_postfix("A*B+C"));
 
-    print!("A-B/C+D*E-F%G\t\t");
-    Priority::new("A-B/C+D*E-F%G").show();  // ABC/-DE*+FG%-
+    // ABC/-DE*+FG%-
+    println!("中序: A-B/C+D*E-F%G，後序: {}", itp.to_postfix("A-B/C+D*E-F%G"));
 
-    print!("A+B*C\t\t\t");
-    Priority::new("A+B*C").show();          // ABC*+
+    // ABC*+
+    println!("中序: A+B*C，後序: {}", itp.to_postfix("A+B*C"));
 
-    print!("A*(B+C)*D\t\t");
-    Priority::new("A*(B+C)*D").show();      // ABC+*D*
+    // ABC+*D*
+    println!("中序: A*(B+C)*D，後序: {}", itp.to_postfix("A*(B+C)*D"));
 
-    print!("-A*(B+C)*-D\t\t");
-    Priority::new("-A*(B+C)*-D").show();    // A-BC+*D-*
+    // A-BC+*D-*
+    println!("中序: (-A)*(B+C)*(-D))，後序: {}", itp.to_postfix("(-A)*(B+C)*(-D)"));
 }

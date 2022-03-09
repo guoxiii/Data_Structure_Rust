@@ -1,118 +1,95 @@
 use std::collections::HashMap;
 
+// 儲存到堆疊中的結構體
 struct OperPriority {
-    ch: char,       // 運算子、運算元
-    priority: i32   // 優先權，數字越大優先權越高
+    ch: char,       // 運算子
+    priority: i32   // 優先權
 }
 
-impl Clone for OperPriority {
-    fn clone(&self) -> OperPriority {
-        OperPriority {
-            ch: self.ch,
-            priority: self.priority
-        }
-    }
+pub struct InfixToPostfix {
+    in_stack_priority: HashMap<char, i32>,   // 堆疊中的運算子優先權
+    in_coming_priority: HashMap<char, i32>,  // 運算式中的運算子優先權
 }
 
-pub struct Priority {
-    pos_neg: bool,                  // true: +、-是正負符號， false: +、-是加減符號
-    stack: Vec<OperPriority>,       // 儲存各運算元和運算子與優先權
-    in_coming: HashMap<char, i32>,  // 設定運算子的優先權
-}
-
-impl Priority {
-    pub fn new(expr: &str) -> Priority {
-        let mut priority = Priority {
-            pos_neg: true,              // 預設+、-是正負符號
-            stack: Vec::new(),
-            in_coming: HashMap::new()
+impl Default for InfixToPostfix {
+    fn default() -> Self {
+        let mut itp = Self {
+            in_stack_priority: HashMap::new(),  // 設定要放入堆疊中時，運算子的優先權
+            in_coming_priority: HashMap::new()  // 設定運算式中，運算子的優先權
         };
 
-        // priority.in_coming.insert('+', 3);
-        // priority.in_coming.insert('-', 3);
-        priority.in_coming.insert('*', 2);
-        priority.in_coming.insert('/', 2);
-        priority.in_coming.insert('%', 2);
-        priority.in_coming.insert('+', 1);
-        priority.in_coming.insert('-', 1);
-        priority.in_coming.insert('(', 4);
-        priority.in_coming.insert(')', 0);
+        itp.in_stack_priority.insert('*', 2);
+        itp.in_stack_priority.insert('/', 2);
+        itp.in_stack_priority.insert('%', 2);
+        itp.in_stack_priority.insert('+', 1);  // 加
+        itp.in_stack_priority.insert('-', 1);  // 減
+        itp.in_stack_priority.insert('(', 0);
+        itp.in_stack_priority.insert(')', 0);
 
-        for c in expr.chars() {
-            // 如果運算子有設定，傳回相對的優先權，否則優先權設定為-1
-            let pv = match priority.in_coming.get(&c) {
-                Some(v) => *v,
-                None => -1,
-            };
+        itp.in_coming_priority.insert('*', 2);
+        itp.in_coming_priority.insert('/', 2);
+        itp.in_coming_priority.insert('%', 2);
+        itp.in_coming_priority.insert('+', 1);  // 加
+        itp.in_coming_priority.insert('-', 1);  // 減
+        itp.in_coming_priority.insert('(', 4);
+        itp.in_coming_priority.insert(')', 0);
 
-            match c {
-                '+' | '-' => match priority.pos_neg {
-                    true => priority.stack.push(OperPriority { ch: c, priority: pv + 2 }),  // 是正負符號，優先權+2
-                    false => {
-                        priority.stack.push(OperPriority { ch: c, priority: pv });
-                        priority.pos_neg = true;    // 下一個遇到的+、-是正負符號
-                    }
-                },
-                _ => {
-                    priority.stack.push(OperPriority { ch: c, priority: pv });
-
-                    if "*/%(".contains(c) {
-                        priority.pos_neg = true;    // 下一個遇到的+、-是正負符號
-                    } else {
-                        priority.pos_neg = false;   // 下一個遇到的+、-不是正負符號
-                    }
-                }
-            }
-        }
-
-        priority
+        itp
     }
+}
 
-    pub fn show(&self) {
+impl InfixToPostfix {
+    pub fn new() -> Self {
+        Default::default()
+    }
+}
+
+impl InfixToPostfix {
+    pub fn to_postfix(&self, infix: &str) -> String {
         let mut stack: Vec<OperPriority> = Vec::new();
+        let mut postfix_str = String::from("");
 
-        for in_coming in &self.stack {
-            if in_coming.priority == -1 {
-                print!("{}", in_coming.ch);     // 運算元直接輸出
-            } else {
-                loop {
-                    match stack.pop() {
-                        Some(v) => {
-                            if  v.priority >= in_coming.priority {
-                                if v.ch != '(' {
-                                    print!("{}", v.ch);
+        for c in infix.chars() {    
+            match self.in_coming_priority.get(&c) {
+                Some(in_coming_priority) => {
+                    loop {
+                        match stack.pop() {
+                            Some(op) => {
+                                if op.priority >= *in_coming_priority {
+                                    if op.ch != '(' {
+                                        postfix_str.push(op.ch);
+                                    }
+                                } else {
+                                    if op.ch != ')' {
+                                        stack.push(op);
+                                    }
+
+                                    stack.push(OperPriority{ ch: c, priority: *self.in_stack_priority.get(&c).unwrap() });
+                                    
+                                    break;
                                 }
-                            } else {
-                                stack.push(v);
-
-                                match in_coming.ch {
-                                    '(' => stack.push(OperPriority { ch: in_coming.ch, priority: 0 }),  // 放入堆疊前改變優先權
-                                    _ => stack.push(in_coming.clone())
+                            },
+                            None => {
+                                if c != ')' {
+                                    stack.push(OperPriority{ ch: c, priority: *self.in_stack_priority.get(&c).unwrap() });
                                 }
 
                                 break;
                             }
-                        },
-                        None => {
-                            match in_coming.ch {
-                                '(' => stack.push(OperPriority { ch: in_coming.ch, priority: 0}),   // 放入堆疊前改變優先權
-                                _ => stack.push(in_coming.clone())
-                            }
-
-                            break;
                         }
                     }
-                }
-            }
+                },
+                None => postfix_str.push(c)
+            }            
         }
 
         loop {
             match stack.pop() {
-                Some(v) if v.ch != '(' && v.ch != ')' => print!("{}", v.ch),
-                _ => break
+                Some(v) => postfix_str.push(v.ch),
+                None => break
             }
         }
 
-        println!("");
+        postfix_str
     }
 }
