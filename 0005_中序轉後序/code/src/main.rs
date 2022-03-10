@@ -66,6 +66,9 @@ fn main() {
     // ABC+*D*
     println!("中序: A*(B+C)*D，後序: {}", itp.to_postfix("A*(B+C)*D"));
 
-    // A-BC+*D-*
+    // A-BC+*D-*，注意：如果沒有在負值的前面補0，計算後式表示式的結果時會出錯
     println!("中序: (-A)*(B+C)*(-D))，後序: {}", itp.to_postfix("(-A)*(B+C)*(-D)"));
+
+    // 0A-BC+*0D-*，注意：要在負值的前面補0，計算後式表示式的結果時才不會出錯
+    println!("中序: (0-A)*(B+C)*(0-D))，後序: {}", itp.to_postfix("(0-A)*(B+C)*(0-D)"));
 }
